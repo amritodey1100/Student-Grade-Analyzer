@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mini Spotify Embed Player — Index</title>
+
+    <!-- Custom font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #0f1724;
+        --card: #0b1220;
+        --muted: #98a0b3;
+        --accent1: #1db954; /* spotify green */
+        --glass: rgba(255, 255, 255, 0.04);
+        --glass-2: rgba(255, 255, 255, 0.02);
+        --radius: 16px;
+        --gap: 14px;
+        font-family: "Poppins", system-ui, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: linear-gradient(
+          180deg,
+          #071026 0%,
+          #071320 45%,
+          #071724 100%
+        );
+        color: #e6eef8;
+      }
+      .wrap {
+        max-width: 1100px;
+        margin: 40px auto;
+        padding: 28px;
+        display: grid;
+        grid-template-columns: 360px 1fr;
+        gap: 24px;
+      }
+
+      /* Left panel - add songs */
+      .panel {
+        background: linear-gradient(180deg, var(--card), #051226);
+        border-radius: var(--radius);
+        padding: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        box-shadow: 0 6px 30px rgba(2, 6, 23, 0.6);
+      }
+      h1 {
+        font-size: 20px;
+        margin: 0 0 8px 0;
+      }
+      p.lead {
+        color: var(--muted);
+        font-size: 13px;
+        margin: 0 0 18px 0;
+      }
+
+      label {
+        display: block;
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+      textarea#embed {
+        width: 100%;
+        min-height: 94px;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        background: var(--glass);
+        color: inherit;
+        resize: vertical;
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+        margin-top: 12px;
+      }
+      .btn {
+        background: linear-gradient(90deg, var(--accent1), #27c17a);
+        border: none;
+        padding: 10px 12px;
+        border-radius: 10px;
+        color: #021017;
+        font-weight: 700;
+        cursor: pointer;
+        flex: 1;
+      }
+      .btn.secondary {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      /* right area - player + list */
+      .player-card {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0.01)
+        );
+        padding: 18px;
+        border-radius: var(--radius);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .now {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .cover {
+        width: 92px;
+        height: 92px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #13202a, #05212b);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 28px;
+        color: var(--accent1);
+        box-shadow: 0 6px 20px rgba(2, 6, 23, 0.6);
+      }
+      .meta {
+        flex: 1;
+      }
+      .meta h2 {
+        margin: 0;
+        font-size: 16px;
+      }
+      .meta p {
+        margin: 2px 0 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .player-frame {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        background: var(--glass-2);
+        height: 92px;
+      }
+
+      /* list */
+      .list {
+        overflow: auto;
+        background: transparent;
+        padding: 6px;
+        border-radius: 10px;
+      }
+      .song {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px;
+        border-radius: 10px;
+        margin-bottom: 8px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.01),
+          transparent
+        );
+        border: 1px solid rgba(255, 255, 255, 0.02);
+      }
+      .song .s-cover {
+        width: 56px;
+        height: 56px;
+        border-radius: 8px;
+        background: linear-gradient(120deg, #062024, #082030);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 18px;
+      }
+      .song .s-info {
+        flex: 1;
+      }
+      .s-title {
+        font-size: 14px;
+        margin: 0;
+      }
+      .s-sub {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+      .s-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      /* tiny icons */
+      .icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        cursor: pointer;
+      }
+
+      footer.help {
+        margin-top: auto;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      /* responsive */
+      @media (max-width: 880px) {
+        .wrap {
+          grid-template-columns: 1fr;
+          max-width: 760px;
+          padding: 18px;
+        }
+        .player-card {
+          min-height: 420px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="panel">
+        <h1>Mini Spotify Embed — Save a song</h1>
+        <p class="lead">
+          Paste a Spotify embed iframe (or a Spotify track URL). The player will
+          appear to the right and saved songs will be stored locally (your
+          browser).
+        </p>
+
+        <label for="embed"
+          >Paste Spotify embed &lt;iframe&gt; or track URL</label
+        >
+        <textarea
+          id="embed"
+          placeholder='Example iframe: &lt;iframe src="https://open.spotify.com/embed/track/6rqhFgbbKwnb9MLmUQDhG6" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"&gt;&lt;/iframe&gt;'
+        ></textarea>
+
+        <div class="row">
+          <button class="btn" id="saveBtn">Save Song</button>
+          <button class="btn secondary" id="clearBtn">Clear All</button>
+        </div>
+
+        <hr
+          style="
+            margin: 16px 0;
+            border: 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.02);
+          "
+        />
+        <p style="font-size: 13px; color: var(--muted); margin: 0 0 8px 0">
+          Quick tips:
+        </p>
+        <ul
+          style="
+            color: var(--muted);
+            padding-left: 18px;
+            margin: 0;
+            font-size: 13px;
+          "
+        >
+          <li>Paste Spotify embed iframe or public track URL.</li>
+          <li>
+            Saved songs are kept in <strong>localStorage</strong> of this
+            browser.
+          </li>
+          <li>Click play to load the embedded player on the right.</li>
+        </ul>
+      </div>
+
+      <div class="player-card">
+        <div class="now">
+          <div class="cover" id="nowCover">♫</div>
+          <div class="meta">
+            <h2 id="nowTitle">Nothing playing</h2>
+            <p id="nowSub">
+              Add a Spotify embed and hit play — songs are saved locally.
+            </p>
+          </div>
+          <div style="width: 72px; text-align: right">
+            <!-- small play icon placeholder -->
+            <div style="font-size: 12px; color: var(--muted)">
+              Saved: <span id="count">0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="player-frame" id="playerFrame">
+          <!-- iframe injected here when user plays -->
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              height: 100%;
+              color: var(--muted);
+            "
+          >
+            Player area — click Play on a saved song
+          </div>
+        </div>
+
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          "
+        >
+          <h3 style="margin: 0">Saved Songs</h3>
+          <div style="color: var(--muted); font-size: 13px">
+            Local · Private
+          </div>
+        </div>
+
+        <div class="list" id="list"></div>
+
+        <footer class="help">
+          Made with ❤️ — paste an iframe and try it. This is a single-file demo
+          (index.html)
+        </footer>
+      </div>
+    </div>
+
+    <!-- Inline SVG icons (simple, custom) -->
+    <svg style="display: none">
+      <symbol id="play" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M8 5v14l11-7z" />
+      </symbol>
+      <symbol id="trash" viewBox="0 0 24 24">
+        <path
+          fill="currentColor"
+          d="M6 7h12v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2zM9 4h6v2H9z"
+        />
+      </symbol>
+      <symbol id="link" viewBox="0 0 24 24">
+        <path
+          fill="currentColor"
+          d="M10.59 13.41a1 1 0 0 0 1.41 0l4.24-4.24a3 3 0 0 0-4.24-4.24L7.76 9.17a1 1 0 0 0 1.41 1.41L12 7.76"
+        />
+      </symbol>
+    </svg>
+
+    <script>
+      // Helper: read & write localStorage
+      const STORAGE_KEY = "mini_spotify_songs_v1";
+      function readSongs() {
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+        } catch (e) {
+          return [];
+        }
+      }
+      function writeSongs(list) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      }
+
+      // DOM refs
+      const embedEl = document.getElementById("embed");
+      const saveBtn = document.getElementById("saveBtn");
+      const clearBtn = document.getElementById("clearBtn");
+      const listEl = document.getElementById("list");
+      const playerFrame = document.getElementById("playerFrame");
+      const nowTitle = document.getElementById("nowTitle");
+      const nowSub = document.getElementById("nowSub");
+      const nowCover = document.getElementById("nowCover");
+      const countEl = document.getElementById("count");
+
+      // Parse an iframe or URL to an embed src
+      function extractSpotifySrc(text) {
+        if (!text) return null;
+        // try to find src attribute if iframe provided
+        const srcMatch = text.match(/src=["']([^"']+)["']/i);
+        if (srcMatch) return srcMatch[1];
+        // if user pasted a spotify url like https://open.spotify.com/track/{id}
+        const urlMatch = text.match(
+          /(https?:\/\/open\.spotify\.com\/track\/[A-Za-z0-9]+)/i
+        );
+        if (urlMatch)
+          return urlMatch[1].replace(
+            /^(https?:\/\/open\.spotify\.com\/track\/)/i,
+            "https://open.spotify.com/embed/track/"
+          );
+        // maybe they pasted an embed already without quotes
+        if (text.includes("open.spotify.com/embed/")) {
+          const idx = text.indexOf("https://open.spotify.com/embed/");
+          return text.slice(idx).split('"')[0].split("'")[0];
+        }
+        return null;
+      }
+
+      function friendlyTitleFromSrc(src) {
+        // try to guess id to make a friendly name; we'll fallback to date-time
+        try {
+          const idMatch = src.match(/embed\/track\/([A-Za-z0-9]+)/i);
+          if (idMatch) {
+            return "Spotify track • " + idMatch[1].slice(0, 8);
+          }
+        } catch (e) {}
+        return "Spotify song • " + new Date().toLocaleString();
+      }
+
+      function render() {
+        const songs = readSongs();
+        countEl.textContent = songs.length;
+        listEl.innerHTML = "";
+        if (songs.length === 0) {
+          listEl.innerHTML =
+            '<div style="color:var(--muted);padding:12px">No songs saved — paste an embed and save.</div>';
+          return;
+        }
+
+        songs.forEach((s, idx) => {
+          const node = document.createElement("div");
+          node.className = "song";
+          node.innerHTML = `
+          <div class="s-cover">${escapeHtml((s.title || "♪").charAt(0))}</div>
+          <div class="s-info">
+            <div class="s-title">${escapeHtml(s.title || "Unknown")}</div>
+            <div class="s-sub">${escapeHtml(s.subtitle || s.src)}</div>
+          </div>
+          <div class="s-actions">
+            <button class="icon" data-action="play" title="Play" data-idx="${idx}"><svg style="width:18px;height:18px" viewBox="0 0 24 24"><use href="#play"></use></svg></button>
+            <button class="icon" data-action="copy" title="Copy embed" data-idx="${idx}"><svg style="width:16px;height:16px" viewBox="0 0 24 24"><use href="#link"></use></svg></button>
+            <button class="icon" data-action="delete" title="Delete" data-idx="${idx}"><svg style="width:16px;height:16px" viewBox="0 0 24 24"><use href="#trash"></use></svg></button>
+          </div>
+        `;
+          listEl.appendChild(node);
+        });
+      }
+
+      // escape for basic safety in this demo
+      function escapeHtml(s) {
+        return String(s).replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            }[c])
+        );
+      }
+
+      // Save button handler
+      saveBtn.addEventListener("click", () => {
+        const raw = embedEl.value.trim();
+        const src = extractSpotifySrc(raw);
+        if (!src) {
+          // try to be helpful: if they pasted a plain open.spotify url
+          alert(
+            "Could not detect a Spotify embed or track URL. Paste the full iframe or an open.spotify.com/track/ID URL."
+          );
+          return;
+        }
+        const songs = readSongs();
+        const newSong = {
+          id: Date.now(),
+          src: src,
+          title: friendlyTitleFromSrc(src),
+          subtitle: new Date().toLocaleString(),
+        };
+        // prevent duplicates by exact src
+        if (songs.some((x) => x.src === newSong.src)) {
+          alert("This song is already saved.");
+          return;
+        }
+        songs.unshift(newSong); // newest first
+        writeSongs(songs);
+        embedEl.value = "";
+        render();
+      });
+
+      clearBtn.addEventListener("click", () => {
+        if (!confirm("Clear all saved songs? This cannot be undone.")) return;
+        localStorage.removeItem(STORAGE_KEY);
+        render();
+        playerFrame.innerHTML =
+          '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);">Player area — click Play on a saved song</div>';
+        nowTitle.textContent = "Nothing playing";
+        nowSub.textContent =
+          "Add a Spotify embed and hit play — songs are saved locally.";
+        nowCover.textContent = "♫";
+      });
+
+      // delegate actions in list
+      listEl.addEventListener("click", (ev) => {
+        const btn = ev.target.closest("button");
+        if (!btn) return;
+        const action = btn.dataset.action;
+        const idx = Number(btn.dataset.idx);
+        const songs = readSongs();
+        const song = songs[idx];
+        if (!song) return;
+        if (action === "play") {
+          playSong(song);
+        } else if (action === "delete") {
+          if (!confirm("Delete this saved song?")) return;
+          songs.splice(idx, 1);
+          writeSongs(songs);
+          render();
+        } else if (action === "copy") {
+          // copy an embed snippet to clipboard
+          const snippet = `<iframe src="${song.src}" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
+          navigator.clipboard
+            .writeText(snippet)
+            .then(() => {
+              alert("Embed code copied to clipboard");
+            })
+            .catch(() => alert("Could not copy."));
+        }
+      });
+
+      function playSong(song) {
+        // inject iframe in playerFrame
+        playerFrame.innerHTML = "";
+        const iframe = document.createElement("iframe");
+        iframe.src = song.src;
+        iframe.width = "100%";
+        iframe.height = "92";
+        iframe.allow = "encrypted-media";
+        iframe.frameBorder = 0;
+        iframe.style.border = "0";
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        playerFrame.appendChild(iframe);
+
+        nowTitle.textContent = song.title || "Spotify song";
+        nowSub.textContent = song.subtitle || song.src;
+        nowCover.textContent = (song.title || "♪").charAt(0);
+      }
+
+      // initial render
+      render();
+
+      // small UX: try to paste embed code when user pastes
+      embedEl.addEventListener("paste", (e) => {
+        setTimeout(() => {
+          const src = extractSpotifySrc(embedEl.value);
+          if (src) {
+            // show preview hint
+            embedEl.style.border = "1px solid rgba(45,200,110,0.6)";
+            setTimeout(
+              () => (embedEl.style.border = "1px solid rgba(255,255,255,0.03)"),
+              900
+            );
+          }
+        }, 50);
+      });
+
+      // For convenience: allow dropping an iframe snippet into the page
+      document.body.addEventListener("dragover", (e) => e.preventDefault());
+      document.body.addEventListener("drop", (e) => {
+        e.preventDefault();
+        const text = e.dataTransfer.getData("text/plain") || "";
+        if (text) embedEl.value = text;
+      });
+    </script>
+  </body>
+</html>

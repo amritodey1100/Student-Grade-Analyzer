@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spotify Player</title>
+    <!-- Custom Fonts: Google Fonts (Roboto) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Custom Icons: Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: "Roboto", sans-serif;
+        background-color: #121212;
+        color: #ffffff;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      h1 {
+        color: #1db954; /* Spotify green */
+        margin-bottom: 20px;
+      }
+      .input-container {
+        display: flex;
+        width: 100%;
+        max-width: 600px;
+        margin-bottom: 20px;
+      }
+      #embedInput {
+        flex-grow: 1;
+        padding: 10px;
+        border: 1px solid #333;
+        border-radius: 4px 0 0 4px;
+        background-color: #282828;
+        color: #ffffff;
+        font-size: 16px;
+      }
+      #addButton {
+        padding: 10px 20px;
+        background-color: #1db954;
+        border: none;
+        border-radius: 0 4px 4px 0;
+        color: #ffffff;
+        cursor: pointer;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+      }
+      #addButton i {
+        margin-right: 8px;
+      }
+      #addButton:hover {
+        background-color: #1ed760;
+      }
+      #songList {
+        width: 100%;
+        max-width: 600px;
+      }
+      .song-item {
+        background-color: #282828;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        padding: 10px;
+        position: relative;
+      }
+      .song-item iframe {
+        width: 100%;
+        height: 80px;
+        border: none;
+        border-radius: 4px;
+      }
+      .delete-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        color: #b3b3b3;
+        cursor: pointer;
+        font-size: 20px;
+      }
+      .delete-button:hover {
+        color: #ffffff;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Spotify Player</h1>
+    <div class="input-container">
+      <input
+        type="text"
+        id="embedInput"
+        placeholder="Paste Spotify embed code here (e.g., <iframe ...></iframe>)"
+      />
+      <button id="addButton"><i class="fas fa-plus"></i>Add Song</button>
+    </div>
+    <div id="songList"></div>
+
+    <script>
+      const songList = document.getElementById("songList");
+      const embedInput = document.getElementById("embedInput");
+      const addButton = document.getElementById("addButton");
+
+      // Load saved songs from localStorage
+      function loadSongs() {
+        const savedSongs =
+          JSON.parse(localStorage.getItem("spotifySongs")) || [];
+        songList.innerHTML = "";
+        savedSongs.forEach((embedCode, index) => {
+          const songItem = document.createElement("div");
+          songItem.classList.add("song-item");
+          songItem.innerHTML = embedCode;
+
+          const deleteButton = document.createElement("button");
+          deleteButton.classList.add("delete-button");
+          deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
+          deleteButton.onclick = () => removeSong(index);
+
+          songItem.appendChild(deleteButton);
+          songList.appendChild(songItem);
+        });
+      }
+
+      // Add new song
+      function addSong() {
+        const embedCode = embedInput.value.trim();
+        if (
+          embedCode &&
+          embedCode.startsWith("<iframe") &&
+          embedCode.endsWith("</iframe>") &&
+          embedCode.includes("open.spotify.com/embed")
+        ) {
+          const savedSongs =
+            JSON.parse(localStorage.getItem("spotifySongs")) || [];
+          savedSongs.push(embedCode);
+          localStorage.setItem("spotifySongs", JSON.stringify(savedSongs));
+          embedInput.value = "";
+          loadSongs();
+        } else {
+          alert("Please enter a valid Spotify embed code.");
+        }
+      }
+
+      // Remove song
+      function removeSong(index) {
+        const savedSongs =
+          JSON.parse(localStorage.getItem("spotifySongs")) || [];
+        savedSongs.splice(index, 1);
+        localStorage.setItem("spotifySongs", JSON.stringify(savedSongs));
+        loadSongs();
+      }
+
+      // Event listeners
+      addButton.addEventListener("click", addSong);
+      window.addEventListener("load", loadSongs);
+    </script>
+  </body>
+</html>

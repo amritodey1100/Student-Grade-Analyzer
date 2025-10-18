@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Grade Analyzer</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="header-container">
+      <h1 class="header">Student Grade Analyzer</h1>
+    </header>
+    <main>
+      <form class="form-container">
+        <input
+          class="student-name"
+          type="text"
+          name="student-name"
+          id=""
+          placeholder="Enter Student's Name"
+        />
+        <input
+          class="student-grades"
+          type="text"
+          name="student-grades"
+          placeholder="Enter The Grades."
+        />
+        <button class="submit-btn" type="submit">Submit</button>
+        <p
+          style="
+            margin: 0 auto;
+            font-size: x-small;
+            font-style: italic;
+            color: #bdb7aa;
+          "
+        >
+          Remember to put "comma" after every number.
+        </p>
+      </form>
+      <div class="results-container"></div>
+    </main>
+    <footer></footer>
+    <script src="./script.js"></script>
+  </body>
+</html>

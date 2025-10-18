@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Spotify Player</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(135deg, #1e1e1e 0%, #0a0a0a 100%);
+        color: #fff;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      header {
+        text-align: center;
+        padding: 40px 0;
+        background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+        margin-bottom: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(29, 185, 84, 0.3);
+      }
+
+      h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+      }
+
+      .logo-icon {
+        width: 50px;
+        height: 50px;
+        background: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+      }
+
+      .subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        font-weight: 300;
+      }
+
+      .add-section {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 40px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+
+      .add-section h2 {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+      }
+
+      .icon {
+        width: 30px;
+        height: 30px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .input-group {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+      }
+
+      input[type="text"] {
+        flex: 1;
+        padding: 15px 20px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        color: #fff;
+        font-size: 1rem;
+        font-family: "Poppins", sans-serif;
+        transition: all 0.3s ease;
+      }
+
+      input[type="text"]:focus {
+        outline: none;
+        border-color: #1db954;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      input[type="text"]::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+      }
+
+      button {
+        padding: 15px 30px;
+        background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Poppins", sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(29, 185, 84, 0.4);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      .help-text {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-top: 10px;
+      }
+
+      .playlist {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 25px;
+        margin-top: 20px;
+      }
+
+      .song-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 20px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .song-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(29, 185, 84, 0.2);
+        border-color: rgba(29, 185, 84, 0.5);
+      }
+
+      .song-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #1db954, #1ed760);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+      }
+
+      .song-card:hover::before {
+        transform: scaleX(1);
+      }
+
+      .song-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .song-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1db954;
+        flex: 1;
+        margin-right: 10px;
+      }
+
+      .delete-btn {
+        padding: 8px 12px;
+        background: rgba(255, 59, 48, 0.2);
+        border: 1px solid rgba(255, 59, 48, 0.3);
+        color: #ff3b30;
+        font-size: 0.85rem;
+        min-width: auto;
+      }
+
+      .delete-btn:hover {
+        background: rgba(255, 59, 48, 0.3);
+        box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3);
+      }
+
+      .spotify-embed {
+        width: 100%;
+        height: 152px;
+        border-radius: 12px;
+        border: none;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: rgba(255, 255, 255, 0.4);
+      }
+
+      .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        opacity: 0.3;
+      }
+
+      .empty-state h3 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+      }
+
+      .empty-state p {
+        font-size: 1rem;
+      }
+
+      @media (max-width: 768px) {
+        h1 {
+          font-size: 2rem;
+        }
+
+        .input-group {
+          flex-direction: column;
+        }
+
+        .playlist {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Custom SVG Icons */
+      .icon-music::before {
+        content: "♫";
+        font-size: 24px;
+      }
+
+      .icon-add::before {
+        content: "+";
+        font-size: 20px;
+        font-weight: bold;
+      }
+
+      .icon-delete::before {
+        content: "×";
+        font-size: 20px;
+        font-weight: bold;
+      }
+
+      .icon-spotify::before {
+        content: "♪";
+        font-size: 30px;
+        color: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>
+          <span class="logo-icon">
+            <span class="icon icon-spotify"></span>
+          </span>
+          My Spotify Player
+        </h1>
+        <p class="subtitle">Save and play your favorite Spotify tracks</p>
+      </header>
+
+      <div class="add-section">
+        <h2>
+          <span class="icon icon-add"></span>
+          Add New Song
+        </h2>
+        <div class="input-group">
+          <input
+            type="text"
+            id="songTitle"
+            placeholder="Song Title (optional)"
+          />
+          <input
+            type="text"
+            id="embedCode"
+            placeholder="Paste Spotify embed code or track URL"
+          />
+          <button onclick="addSong()">
+            <span class="icon icon-add"></span>
+            Add Song
+          </button>
+        </div>
+        <p class="help-text">
+          💡 Tip: Get embed code from Spotify → Right-click on track → Share →
+          Embed track
+        </p>
+      </div>
+
+      <div id="playlist" class="playlist"></div>
+    </div>
+
+    <script>
+      // Storage for songs (using in-memory storage)
+      let songs = [];
+
+      // Load songs from memory on page load
+      function loadSongs() {
+        if (songs.length === 0) {
+          displayEmptyState();
+        } else {
+          displaySongs();
+        }
+      }
+
+      // Extract Spotify track ID from various formats
+      function extractTrackId(input) {
+        // Remove any whitespace
+        input = input.trim();
+
+        // If it's an embed code (iframe)
+        const iframeMatch = input.match(
+          /src="https:\/\/open\.spotify\.com\/embed\/track\/([a-zA-Z0-9]+)/
+        );
+        if (iframeMatch) return iframeMatch[1];
+
+        // If it's a Spotify URL
+        const urlMatch = input.match(/track\/([a-zA-Z0-9]+)/);
+        if (urlMatch) return urlMatch[1];
+
+        // If it's just the track ID
+        if (/^[a-zA-Z0-9]+$/.test(input)) return input;
+
+        return null;
+      }
+
+      // Add a new song
+      function addSong() {
+        const titleInput = document.getElementById("songTitle");
+        const embedInput = document.getElementById("embedCode");
+
+        const title = titleInput.value.trim() || "Untitled Track";
+        const embedCode = embedInput.value.trim();
+
+        if (!embedCode) {
+          alert("Please paste a Spotify embed code or track URL!");
+          return;
+        }
+
+        const trackId = extractTrackId(embedCode);
+
+        if (!trackId) {
+          alert("Invalid Spotify embed code or URL. Please try again!");
+          return;
+        }
+
+        const song = {
+          id: Date.now(),
+          title: title,
+          trackId: trackId,
+        };
+
+        songs.push(song);
+
+        // Clear inputs
+        titleInput.value = "";
+        embedInput.value = "";
+
+        // Update display
+        displaySongs();
+      }
+
+      // Delete a song
+      function deleteSong(id) {
+        songs = songs.filter((song) => song.id !== id);
+
+        if (songs.length === 0) {
+          displayEmptyState();
+        } else {
+          displaySongs();
+        }
+      }
+
+      // Display all songs
+      function displaySongs() {
+        const playlist = document.getElementById("playlist");
+
+        playlist.innerHTML = songs
+          .map(
+            (song) => `
+                <div class="song-card">
+                    <div class="song-header">
+                        <div class="song-title">
+                            <span class="icon icon-music"></span>
+                            ${song.title}
+                        </div>
+                        <button class="delete-btn" onclick="deleteSong(${song.id})">
+                            <span class="icon icon-delete"></span>
+                            Delete
+                        </button>
+                    </div>
+                    <iframe 
+                        class="spotify-embed"
+                        src="https://open.spotify.com/embed/track/${song.trackId}?utm_source=generator&theme=0" 
+                        frameborder="0" 
+                        allowfullscreen="" 
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                        loading="lazy">
+                    </iframe>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      // Display empty state
+      function displayEmptyState() {
+        const playlist = document.getElementById("playlist");
+        playlist.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">♫</div>
+                    <h3>No songs yet</h3>
+                    <p>Add your first song to get started!</p>
+                </div>
+            `;
+      }
+
+      // Initialize on page load
+      loadSongs();
+
+      // Allow adding song with Enter key
+      document
+        .getElementById("embedCode")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            addSong();
+          }
+        });
+    </script>
+  </body>
+</html>
